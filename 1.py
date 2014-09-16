@@ -1,8 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cmath as cmath
+import sys
+from math import log
 
-N = 8
+if (len(sys.argv) > 1) and (sys.argv[1].isdigit()) and ((log(int(sys.argv[1]))/log(2)).is_integer()):
+  N = int(sys.argv[1])
+else:
+  N = 8
+
 period = 2 * np.pi
 
 class Config:
