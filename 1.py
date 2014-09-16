@@ -47,7 +47,7 @@ dft_phase = map(cmath.phase, y_dft)
 y_idft = np.real(dft(y_dft, -1))
 
 Config.fft = 0
-y_fft = fft(y, 1)
+y_fft = np.divide(fft(y, 1), N)
 fft_abs = map(abs, y_fft)
 fft_phase = map(cmath.phase, y_fft)
 y_ifft = np.real(np.divide(fft(y_fft, -1),N))
