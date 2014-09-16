@@ -2,58 +2,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cmath as cmath
 
-N = 64
+N = 8
 period = 2 * np.pi
+
+class Config:
+  dft = 0
+  fft = 0
 
 def function(x):
   return np.cos(x) + np.sin(x)
 
 def dft(x, dir):
-  i = 0
+  Config.dft = 0
   N = len(x)
   y = [0]*N
   for k in range(0, N):
     for m in range(0, N):
       y[k] += x[m] * np.exp(-dir * 2j * np.pi * k * m / N)
-      i += 1
+      Config.dft += 6
     if dir == 1:
       y[k] /= N
   return y
 
-# def fft(a, dir):
-#   N = len(a)
-#   if N == 1 : return a
-
-#   a1 = [0] * (N / 2 + N % 2)
-#   a2 = [0] * (N / 2)
-
-#   i = 0
-#   while(i < N):
-#       if i % 2 == 0:
-#         a1[i / 2] = a[i]
-#       else:
-#         a2[i / 2] = a[i]
-#       i += 1
-#   b1 = fft(a1, dir)
-#   b2 = fft(a2, dir)
-
-#   wN = np.cos(2 * np.pi / N) + dir * np.sin(2 * np.pi / N) * 1j
-#   w = 1
-
-#   y = [0]*N
-#   j = 0
-#   while(j < N / 2):
-#       y[j] = b1[j] + b2[j] * w
-#       y[j + N /2] = b1[j] - b2[j] * w
-#       w *= wN
-#       j += 1
-
-#   return y
-
 def W(n, N, dir):
+  Config.fft += 4
   return np.exp(-1j * dir * 2 * np.pi * n/N)
 
 def fft(x, dir):
+  Config.fft += 5
   N = len(x)
   if N <= 1:
     return x
@@ -70,15 +46,14 @@ dft_abs = map(abs, y_dft)
 dft_phase = map(cmath.phase, y_dft)
 y_idft = np.real(dft(y_dft, -1))
 
+Config.fft = 0
 y_fft = fft(y, 1)
 fft_abs = map(abs, y_fft)
 fft_phase = map(cmath.phase, y_fft)
 y_ifft = np.real(np.divide(fft(y_fft, -1),N))
 
-# y_fft = np.fft.fft(y)
-# fft_abs = map(abs, y_fft)
-# fft_phase = map(cmath.phase, y_fft)
-# y_ifft = np.real(np.fft.ifft(y_fft))
+print "DFT: {}".format(Config.dft)
+print "FFT: {}".format(Config.fft)
 
 fig, axes = plt.subplots(nrows=2, ncols=4, figsize=(6,6))
 
