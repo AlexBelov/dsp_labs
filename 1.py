@@ -34,15 +34,37 @@ def W(n, N, dir):
   Config.fft += 4
   return np.exp(-1j * dir * 2 * np.pi * n/N)
 
-def fft(x, dir):
+def fft(a, dir):
+  N = len(a)
+  if N == 1 : return a
+
+  a1 = [0] * (N / 2 + N % 2)
+  a2 = [0] * (N / 2)
+
+  i = 0
+  while(i < N):
+    if i % 2 == 0:
+      a1[i / 2] = a[i]
+    else:
+      a2[i / 2] = a[i]
+    i += 1
+  b1 = fft(a1, dir)
+  b2 = fft(a2, dir)
+
+  wN = np.cos(2 * np.pi / N) + dir * np.sin(2 * np.pi / N) * 1j
+  w = 1
   Config.fft += 5
-  N = len(x)
-  if N <= 1:
-    return x
-  even = fft(x[0::2], dir)
-  odd = fft(x[1::2], dir)
-  return [even[n] + W(n, N, dir) * odd[n] for n in xrange(N/2)] + \
-         [even[n] - W(n, N, dir) * odd[n] for n in xrange(N/2)]
+
+  y = [0]*N
+  j = 0
+  while(j < N / 2):
+    y[j] = b1[j] + b2[j] * w
+    y[j + N /2] = b1[j] - b2[j] * w
+    w *= wN
+    j += 1
+    Config.fft += 4
+
+  return y
 
 x = np.arange(0, period, period/N)
 
@@ -56,7 +78,7 @@ Config.fft = 0
 y_fft = np.divide(fft(y, 1), N)
 fft_abs = map(abs, y_fft)
 fft_phase = map(cmath.phase, y_fft)
-y_ifft = np.real(np.divide(fft(y_fft, -1),N))
+y_ifft = np.real(fft(y_fft, -1))
 
 print "DFT: {}".format(Config.dft)
 print "FFT: {}".format(Config.fft)
